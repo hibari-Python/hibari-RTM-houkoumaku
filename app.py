@@ -16,31 +16,20 @@ switch_interval = st.number_input("切り替え秒数（秒）", min_value=1, ma
 
 image_area = st.empty()
 
-if houmen_selected == "なし":
-    # 方面なしなら固定表示
-    type_image_path = os.path.join(base_dir, "方向幕", "種別", f"{type_selected}.png")
-    dest_image_path = os.path.join(base_dir, "方向幕", "行き先", f"{dest_selected}.png")
-
-    if os.path.exists(type_image_path) and os.path.exists(dest_image_path):
-        img_type = Image.open(type_image_path)
-        img_dest = Image.open(dest_image_path)
-        base_height = img_type.height
-        ratio = base_height / img_dest.height
-        new_width = int(img_dest.width * ratio)
-        img_dest_resized = img_dest.resize((new_width, base_height))
-        total_width = img_type.width + img_dest_resized.width
-        new_img = Image.new("RGBA", (total_width, base_height))
-        new_img.paste(img_type, (0, 0))
-        new_img.paste(img_dest_resized, (img_type.width, 0))
-        image_area.image(new_img)
-    else:
-        st.error("画像が見つかりません。")
+if type_selected == "回送":
+    # 回送は何も表示しない or 空画像表示
+    st.write("回送のため表示なし")
+    # もし空画像を用意しているなら表示例:
+    # empty_img_path = os.path.join(base_dir, "方向幕", "種別", "nothing.png")
+    # if os.path.exists(empty_img_path):
+    #     img_empty = Image.open(empty_img_path)
+    #     image_area.image(img_empty)
 else:
-    # 行幸方面選択時は交互表示
-    while True:
-        # ① 種別＋行き先表示
+    if houmen_selected == "なし":
+        # 方面なしなら固定表示
         type_image_path = os.path.join(base_dir, "方向幕", "種別", f"{type_selected}.png")
         dest_image_path = os.path.join(base_dir, "方向幕", "行き先", f"{dest_selected}.png")
+
         if os.path.exists(type_image_path) and os.path.exists(dest_image_path):
             img_type = Image.open(type_image_path)
             img_dest = Image.open(dest_image_path)
@@ -53,21 +42,41 @@ else:
             new_img.paste(img_type, (0, 0))
             new_img.paste(img_dest_resized, (img_type.width, 0))
             image_area.image(new_img)
-        time.sleep(switch_interval)
+        else:
+            st.error("画像が見つかりません。")
+    else:
+        # 行幸方面選択時は交互表示
+        while True:
+            # ① 種別＋行き先表示
+            type_image_path = os.path.join(base_dir, "方向幕", "種別", f"{type_selected}.png")
+            dest_image_path = os.path.join(base_dir, "方向幕", "行き先", f"{dest_selected}.png")
+            if os.path.exists(type_image_path) and os.path.exists(dest_image_path):
+                img_type = Image.open(type_image_path)
+                img_dest = Image.open(dest_image_path)
+                base_height = img_type.height
+                ratio = base_height / img_dest.height
+                new_width = int(img_dest.width * ratio)
+                img_dest_resized = img_dest.resize((new_width, base_height))
+                total_width = img_type.width + img_dest_resized.width
+                new_img = Image.new("RGBA", (total_width, base_height))
+                new_img.paste(img_type, (0, 0))
+                new_img.paste(img_dest_resized, (img_type.width, 0))
+                image_area.image(new_img)
+            time.sleep(switch_interval)
 
-        # ② nothing（種別）＋ 行幸方面（方面）
-        type_image_path = os.path.join(base_dir, "方向幕", "種別", "nothing.png")
-        houmen_image_path = os.path.join(base_dir, "方向幕", "行き先", "行幸方面.png")
-        if os.path.exists(type_image_path) and os.path.exists(houmen_image_path):
-            img_type = Image.open(type_image_path)
-            img_dest = Image.open(houmen_image_path)
-            base_height = img_type.height
-            ratio = base_height / img_dest.height
-            new_width = int(img_dest.width * ratio)
-            img_dest_resized = img_dest.resize((new_width, base_height))
-            total_width = img_type.width + img_dest_resized.width
-            new_img = Image.new("RGBA", (total_width, base_height))
-            new_img.paste(img_type, (0, 0))
-            new_img.paste(img_dest_resized, (img_type.width, 0))
-            image_area.image(new_img)
-        time.sleep(switch_interval)
+            # ② nothing（種別）＋ 行幸方面（方面）
+            type_image_path = os.path.join(base_dir, "方向幕", "種別", "nothing.png")
+            houmen_image_path = os.path.join(base_dir, "方向幕", "行き先", "行幸方面.png")
+            if os.path.exists(type_image_path) and os.path.exists(houmen_image_path):
+                img_type = Image.open(type_image_path)
+                img_dest = Image.open(houmen_image_path)
+                base_height = img_type.height
+                ratio = base_height / img_dest.height
+                new_width = int(img_dest.width * ratio)
+                img_dest_resized = img_dest.resize((new_width, base_height))
+                total_width = img_type.width + img_dest_resized.width
+                new_img = Image.new("RGBA", (total_width, base_height))
+                new_img.paste(img_type, (0, 0))
+                new_img.paste(img_dest_resized, (img_type.width, 0))
+                image_area.image(new_img)
+            time.sleep(switch_interval)
